@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_education/models/product_model.dart';
+import '../models/product_model.dart';
 
 class ListItem extends StatelessWidget {
   final ProductModel product;
-  const ListItem({super.key, required this.product});
+  final VoidCallback onAdd;
+  final VoidCallback onRemove;
+
+  const ListItem({
+    super.key,
+    required this.product,
+    required this.onAdd,
+    required this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +20,13 @@ class ListItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 20),
       height: 200,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          image: DecorationImage(
-              image: NetworkImage(product.thumbnail),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken))),
+        borderRadius: BorderRadius.circular(20),
+        image: DecorationImage(
+          image: NetworkImage(product.thumbnail),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken),
+        ),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,6 +45,19 @@ class ListItem extends StatelessWidget {
               fontSize: 12,
             ),
             overflow: TextOverflow.ellipsis,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                onPressed: onAdd,
+              ),
+              IconButton(
+                icon: const Icon(Icons.remove, color: Colors.white),
+                onPressed: onRemove,
+              ),
+            ],
           )
         ],
       ),

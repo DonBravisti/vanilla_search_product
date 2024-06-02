@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_education/models/products_model.dart';
+import 'package:provider/provider.dart';
 
 import '../models/product_model.dart';
+import '../state/cart_state.dart';
 import '../widgets/list_item.dart';
 
 enum SearchStatus { initial, loading, success, failure }
@@ -20,7 +22,7 @@ class _SearchPageState extends State<SearchPage> {
   List<ProductModel> products = [];
 
   @override
-  initState() {
+  void initState() {
     _dio = Dio();
     super.initState();
   }
@@ -51,6 +53,8 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cartState = Provider.of<CartState>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -67,21 +71,32 @@ class _SearchPageState extends State<SearchPage> {
             const SizedBox(
               height: 8,
             ),
-            Expanded(child: Builder(builder: (context) {
-              switch (_searchStatus) {
-                case SearchStatus.initial:
-                  return const Center(child: Text('Начните поиск'));
-                case SearchStatus.loading:
-                  return const Center(child: CircularProgressIndicator());
-                case SearchStatus.success:
-                  return ListView.builder(
-                    itemCount: products.length,
-                    itemBuilder: (context, index) => ListItem(product: products[index]),
-                  );
-                case SearchStatus.failure:
-                  return const Center(child: Text('Произошла ошибка'));
-              }
-            })),
+            Expanded(
+              child: Builder(
+                builder: (context) {
+                  switch (_searchStatus) {
+                    case SearchStatus.initial:
+                      return const Center(child: Text('Начните поиск'));
+                    case SearchStatus.loading:
+                      return const Center(child: CircularProgressIndicator());
+                    case SearchStatus.success:
+                      return ListView.builder(
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          return ListItem(
+                            product: product,
+                            onAdd: () => cartState.addProduct(product),
+                            onRemove: () => cartState.removeProduct(product),
+                          );
+                        },
+                      );
+                    case SearchStatus.failure:
+                      return const Center(child: Text('Произошла ошибка'));
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),
